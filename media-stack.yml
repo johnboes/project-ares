@@ -1,8 +1,14 @@
 version: "3.9"
+
+x-common-labels: &watchtower_labels
+  labels:
+    - "com.centurylinklabs.watchtower.enable=true"
+
 services:
   plex:
     image: linuxserver/plex
     container_name: plex
+    <<: *watchtower_labels
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -13,7 +19,6 @@ services:
       - /volume1/docker/plex/config:/config
       - /volume1/docker/plex/transcode:/transcode
       - /volume2/plex-media:/media:ro
-      
     ports:
       - "32400:32400"
     networks:
@@ -23,6 +28,7 @@ services:
   nzbget:
     image: linuxserver/nzbget
     container_name: nzbget
+    <<: *watchtower_labels
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -39,6 +45,7 @@ services:
   radarr:
     image: linuxserver/radarr
     container_name: radarr
+    <<: *watchtower_labels
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -56,6 +63,7 @@ services:
   sonarr:
     image: linuxserver/sonarr
     container_name: sonarr
+    <<: *watchtower_labels
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -73,6 +81,7 @@ services:
   readarr:
     image: lscr.io/linuxserver/readarr:develop
     container_name: readarr
+    <<: *watchtower_labels
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -90,6 +99,7 @@ services:
   prowlarr:
     image: lscr.io/linuxserver/prowlarr
     container_name: prowlarr
+    <<: *watchtower_labels
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -105,6 +115,7 @@ services:
   tautulli:
     image: linuxserver/tautulli
     container_name: tautulli
+    <<: *watchtower_labels
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -117,10 +128,11 @@ services:
     networks:
       - tds_net
     restart: unless-stopped
-    
+
   overseerr:
     image: sctx/overseerr
     container_name: overseerr
+    <<: *watchtower_labels
     environment:
       - LOG_LEVEL=debug
       - TZ=${TZ}
@@ -130,6 +142,19 @@ services:
       - "5055:5055"
     volumes:
       - /volume1/docker/overseerr/config:/app/config
+    networks:
+      - tds_net
+    restart: unless-stopped
+
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    environment:
+      - TZ=${TZ}
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_LABEL_ENABLE=true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - tds_net
     restart: unless-stopped
