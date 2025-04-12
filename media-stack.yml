@@ -11,7 +11,9 @@ services:
       - PLEX_CLAIM=${PLEX_CLAIM}
     volumes:
       - /volume1/docker/plex/config:/config
+      - /volume1/docker/plex/transcode:/transcode
       - /volume2/plex-media:/media:ro
+      
     ports:
       - "32400:32400"
     networks:
