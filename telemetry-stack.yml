@@ -58,7 +58,7 @@ services:
     restart: unless-stopped
 
   speedtest:
-    image: mikeroyal/speedtest-exporter
+    image: ghcr.io/showwin/speedtest-exporter:latest
     container_name: speedtest
     ports:
       - "9798:9798"
