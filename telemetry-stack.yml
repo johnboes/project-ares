@@ -57,15 +57,6 @@ services:
       - tds_net
     restart: unless-stopped
 
-  speedtest:
-    image: ghcr.io/jamesmstone/speedtest-exporter:latest
-    container_name: speedtest
-    ports:
-      - "9798:9798"
-    networks:
-      - tds_net
-    restart: unless-stopped
-
   unifi-poller:
     image: golift/unifi-poller
     container_name: unifi-poller
