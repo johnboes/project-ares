@@ -117,6 +117,22 @@ services:
     networks:
       - tds_net
     restart: unless-stopped
+    
+  overseerr:
+    image: sctx/overseerr
+    container_name: overseerr
+    environment:
+      - LOG_LEVEL=debug
+      - TZ=${TZ}
+      - PUID=${PUID}
+      - PGID=${PGID}
+    ports:
+      - "5055:5055"
+    volumes:
+      - /volume1/docker/overseerr/config:/app/config
+    networks:
+      - tds_net
+    restart: unless-stopped
 
 networks:
   tds_net:
