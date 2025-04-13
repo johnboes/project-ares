@@ -1,4 +1,4 @@
-# Infra Docker Stacks
+# Project Ares
 
 This repository contains my complete Docker Compose infrastructure for automating media ingestion, managing telemetry, and enabling secure public access using Cloudflare Zero Trust tunnels. Everything runs on a Synology RS1221+ (`Ares`) and is deployed through reproducible, version-controlled Compose files.
 
