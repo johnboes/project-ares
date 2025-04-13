@@ -144,7 +144,7 @@ services:
       - tds_net
     restart: unless-stopped
 
-    gluetun:
+  gluetun:
     image: qmcgaw/gluetun
     container_name: gluetun
     cap_add:
