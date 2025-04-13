@@ -1,1 +1,40 @@
+# Environment and secrets
 .env
+.env.*
+*.local
+*.secret
+secrets.json
+
+# Docker
+**/docker-compose.override.yml
+**/docker-compose.*.yml
+**/docker/*.log
+**/docker/*-data/
+docker-compose.override.yml
+docker-compose.dev.yml
+
+# System / OS files
+.DS_Store
+Thumbs.db
+
+# Editor / IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Log files
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Backup or temp files
+*.bak
+*.tmp
+*.temp
+~$*
+
+# Git
+.gitignore~
