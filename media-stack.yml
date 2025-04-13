@@ -1,5 +1,4 @@
 version: "3.9"
-
 services:
   plex:
     image: linuxserver/plex
@@ -23,6 +22,9 @@ services:
   nzbget:
     image: linuxserver/nzbget
     container_name: nzbget
+    network_mode: "service:gluetun"
+    depends_on:
+      - gluetun
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -30,10 +32,6 @@ services:
     volumes:
       - /volume1/docker/nzbget/config:/config
       - /volume1/docker/nzbget/downloads:/downloads
-    ports:
-      - "6789:6789"
-    networks:
-      - tds_net
     restart: unless-stopped
 
   radarr:
@@ -142,6 +140,27 @@ services:
     command: --cleanup --interval 300
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - tds_net
+    restart: unless-stopped
+
+    gluetun:
+    image: qmcgaw/gluetun
+    container_name: gluetun
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun
+    environment:
+      - VPN_SERVICE_PROVIDER=mullvad
+      - VPN_TYPE=wireguard
+      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
+      - WIREGUARD_ADDRESSES=${WIREGUARD_ADDRESSES}
+      - TZ=${TZ}
+    volumes:
+      - /volume1/docker/gluetun:/gluetun
+    ports:
+      - 8112:8112 # Optional if using web interface of routed container (e.g., Deluge)
     networks:
       - tds_net
     restart: unless-stopped
