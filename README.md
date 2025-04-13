@@ -129,6 +129,10 @@ GF_SECURITY_ADMIN_PASSWORD=
 # Cloudflare Tunnel
 CLOUDFLARE_TUNNEL_TOKEN=
 
+## 📄 Changelog
+
+For a full list of updates, see [CHANGELOG.md](./CHANGELOG.md).
+
 ## 📬 Questions?
 
 Feel free to fork, adapt, or open an issue.
