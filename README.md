@@ -2,7 +2,7 @@
 
 This repository contains my complete Docker Compose infrastructure for automating media ingestion, managing telemetry, and enabling secure public access using Cloudflare Zero Trust tunnels. Everything runs on a Synology RS1221+ (`Ares`) and is deployed through reproducible, version-controlled Compose files.
 
-> ✅ Docker version: `24.0.7`, deployed using `docker-compose` v2+ syntax 
+> ✅ Docker version: `24.0.7`, deployed using `docker-compose` v2+ syntax
 
 ---
 
