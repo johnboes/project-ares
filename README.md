@@ -11,17 +11,17 @@ This repository contains my complete Docker Compose infrastructure for automatin
 ### `media-stack.yml`
 Automates and organizes Plex-compatible media:
 
-| Service    | Purpose                                       |
-|------------|-----------------------------------------------|
-| **Plex**   | Media playback and library organization       |
-| **Radarr** | Movie download automation                     |
-| **Sonarr** | TV show download automation                   |
-| **Readarr**| Book and audiobook automation                 |
-| **NZBGet** | Usenet downloader                             |
-| **Prowlarr**| Indexer and search manager for the stack     |
-| **Tautulli**| Tracks Plex usage and viewing metrics        |
-| **Overseerr**| Allows friends to request content securely  |
-| **Watchtower**| Automatically keeps containers updated     |
+| Service     | Purpose                                       |
+|-------------|-----------------------------------------------|
+| **Plex**    | Media playback and library organization       |
+| **Radarr**  | Movie download automation                     |
+| **Sonarr**  | TV show download automation                   |
+| **Readarr** | Book and audiobook automation                 |
+| **NZBGet**  | Usenet downloader                             |
+| **Prowlarr**| Indexer and search manager for the stack      |
+| **Tautulli**| Tracks Plex usage and viewing metrics         |
+| **Overseerr**| Allows friends to request content securely   |
+| **Watchtower**| Automatically keeps containers updated      |
 
 All media services are containerized and isolated on a shared custom network `tds_net`. Volumes are mounted from a dedicated Synology folder structure to ensure separation between config, downloads, and permanent storage.
 
@@ -39,6 +39,7 @@ Provides complete infrastructure and network health telemetry:
 | **Unifi Poller**| Tracks UDM Pro and UniFi switches/APs                    |
 | **Cloudflared** | Tunnel service exposing dashboards securely              |
 | **Watchtower**  | Auto-updates for this stack                              |
+| **Git Webhook** | Enables auto-pull from GitHub main branch on push       |
 
 The full telemetry suite is deployed as containers and designed to be observable from anywhere, but only via Cloudflare’s Zero Trust model.
 
@@ -77,6 +78,29 @@ This config is located in the `telemetry-stack.yml` and requires a working tunne
 
 ---
 
+## 🔁 Auto-pull Integration
+
+A GitHub webhook is configured to call a secure endpoint exposed via Cloudflare Tunnel. When changes are pushed to the `main` branch, the webhook triggers an update on the server and automatically pulls the latest version of the repo into production.
+
+This is powered by:
+- The `git-webhook` container defined in `telemetry-stack.yml`
+- A custom shell script stored at `/volume1/docker/git-webhook/hooks/git-pull.sh`
+- A `hooks.json` configuration mounted into `/etc/webhook/` inside the container
+
+---
+
+## 🛡 Security Notes
+
+- No ports are exposed to the public internet
+- All access is routed through Cloudflare Zero Trust tunnels
+- GitHub webhooks do not reveal sensitive data and require an authenticated tunnel
+- All environment variables and secrets (tokens, passwords, IPs) are stored in a private `.env` file and excluded from version control via `.gitignore`
+- No Plex accounts, tokens, IPs, or webhook secrets are hardcoded
+
+This setup follows InfoSec best practices and would meet expectations under SOC 2 Type II and ISO 27001 controls for secure infrastructure deployment and versioning.
+
+---
+
 ## 🗂 Folder Structure
 
 ```text
@@ -101,9 +125,15 @@ infra-docker-stacks/
 ├── telegraf/
 ├── unifi-poller/
 ├── cloudflared/
+├── git-webhook/
 └── watchtower/
+```
 
-##Environment Variables Template
+---
+
+## 📄 Environment Variables Template
+
+```
 TZ=
 PUID=
 PGID=
@@ -128,14 +158,18 @@ GF_SECURITY_ADMIN_PASSWORD=
 
 # Cloudflare Tunnel
 CLOUDFLARE_TUNNEL_TOKEN=
+```
+
+---
 
 ## 📄 Changelog
 
 For a full list of updates, see [CHANGELOG.md](./CHANGELOG.md).
+
+---
 
 ## 📬 Questions?
 
 Feel free to fork, adapt, or open an issue.
 
 This is a personal project maintained and used in production on Synology hardware.
-# Test webhook trigger
