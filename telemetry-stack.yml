@@ -1,4 +1,5 @@
 version: "3.9"
+
 services:
   influxdb:
     image: influxdb:2.7
@@ -94,6 +95,20 @@ services:
     networks:
       - tds_net
     restart: unless-stopped
+
+  git-webhook:
+    image: almir/webhook
+    container_name: git-webhook
+    volumes:
+      - /volume1/docker/git-webhook/hooks:/etc/webhook
+      - /volume1/docker/infra-docker-stacks:/repo
+    working_dir: /repo
+    command: -hooks=/etc/webhook/hooks.json -verbose -port 9000
+    ports:
+      - "9000:9000"
+    restart: unless-stopped
+    networks:
+      - tds_net
 
 networks:
   tds_net:
