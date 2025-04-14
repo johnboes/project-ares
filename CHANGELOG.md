@@ -13,8 +13,11 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
-## [v1.2.0] – 2025-04-14
+## [v1.2.0] – 2025-04-13
 ### Added
+- Completed Telegraf integration with InfluxDB 2 for system telemetry
+- Hardcoded InfluxDB connection values in `telegraf.conf` for stable communication
+- Validated metrics collection via container network and Grafana dashboards
 - Implemented automated GitHub webhook integration using [webhook](https://github.com/adnanh/webhook)
 - Created secure Cloudflare Tunnel for webhook delivery at `https://webhook.tartarusonline.work/hooks/update`
 - Added `git-webhook` service to `telemetry-stack.yml` with mounted `hooks.json` and shell executor
@@ -28,7 +31,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
-## [v1.1.0] – 2025-04-13
+## [v1.1.0] – 2025-04-12
 ### Added
 - Introduced Gluetun container with built-in WireGuard support
 - Routed all NZBGet traffic through Gluetun using `network_mode: service:gluetun`
@@ -45,7 +48,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
-## [v1.0.0] – 2025-04-12
+## [v1.0.0] – 2025-04-11
 ### Added
 - Full media stack: Plex, Radarr, Sonarr, Readarr, NZBGet, Prowlarr, Tautulli
 - Full telemetry stack: Grafana, Prometheus, Telegraf, InfluxDB, Unifi Poller
