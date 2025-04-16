@@ -63,7 +63,7 @@ services:
     restart: unless-stopped
 
   unifi-poller:
-    image: golift/unifi-poller:latest
+    image: golift/unifi-poller:v2.1.7
     container_name: unifi-poller
     hostname: unifi-poller
     environment:
