@@ -65,6 +65,7 @@ services:
   unifi-poller:
     image: golift/unifi-poller:latest
     container_name: unifi-poller
+    hostname: unifi-poller
     environment:
       - TZ=${TZ}
       - UP_UNIFI_DEFAULT_USER=${UP_UNIFI_DEFAULT_USER}
