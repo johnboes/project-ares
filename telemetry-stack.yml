@@ -70,6 +70,12 @@ services:
       - UP_UNIFI_DEFAULT_USER=${UP_UNIFI_DEFAULT_USER}
       - UP_UNIFI_DEFAULT_PASS=${UP_UNIFI_DEFAULT_PASS}
       - UP_UNIFI_DEFAULT_URL=${UP_UNIFI_DEFAULT_URL}
+      - UP_INFLUXDB_DISABLE=false
+      - UP_INFLUXDB_URL=http://influxdb:8086
+      - UP_INFLUXDB_DB=unifi
+      - UP_INFLUXDB_USER=${INFLUXDB_USERNAME}
+      - UP_INFLUXDB_PASS=${INFLUXDB_PASSWORD}
+      - UP_LOG_LEVEL=info
     volumes:
       - /volume1/docker/unifi-poller:/config
     ports:
@@ -77,6 +83,8 @@ services:
     networks:
       - tds_net
     restart: unless-stopped
+    depends_on:
+      - influxdb
 
   cloudflared:
     image: cloudflare/cloudflared:latest
