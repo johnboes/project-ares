@@ -76,6 +76,7 @@ services:
       - UP_INFLUXDB_USER=${INFLUXDB_USERNAME}
       - UP_INFLUXDB_PASS=${INFLUXDB_PASSWORD}
       - UP_LOG_LEVEL=info
+      - UP_UNIFI_DEFAULT_IS_UNIFI_OS=true
     volumes:
       - /volume1/docker/unifi-poller:/config
     ports:
