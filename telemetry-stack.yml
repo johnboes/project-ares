@@ -115,8 +115,7 @@ services:
     container_name: git-webhook
     volumes:
       - /volume1/docker/git-webhook/hooks:/etc/webhook
-      - /volume1/docker/infra-docker-stacks:/repo
-      - /volume1/docker/git-webhook/hooks:/etc/webhook      
+      - /volume1/docker/infra-docker-stacks:/repo     
     working_dir: /repo
     command: -hooks=/etc/webhook/hooks.json -verbose -port 9000
     ports:
