@@ -3,6 +3,7 @@ services:
   plex:
     image: linuxserver/plex
     container_name: plex
+    hostname: plex
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -37,6 +38,7 @@ services:
   radarr:
     image: linuxserver/radarr
     container_name: radarr
+    hostname: radarr
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -54,6 +56,7 @@ services:
   sonarr:
     image: linuxserver/sonarr
     container_name: sonarr
+    hostname: sonarr
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -71,6 +74,7 @@ services:
   readarr:
     image: lscr.io/linuxserver/readarr:develop
     container_name: readarr
+    hostname: readarr
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -88,6 +92,7 @@ services:
   prowlarr:
     image: lscr.io/linuxserver/prowlarr
     container_name: prowlarr
+    hostname: prowlarr
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -103,6 +108,7 @@ services:
   tautulli:
     image: linuxserver/tautulli
     container_name: tautulli
+    hostname: tautulli
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -119,6 +125,7 @@ services:
   overseerr:
     image: sctx/overseerr
     container_name: overseerr
+    hostname: overseerr
     environment:
       - LOG_LEVEL=debug
       - TZ=${TZ}
