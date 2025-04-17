@@ -19,12 +19,22 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Added `plex-stack.env` for Plex-specific and VPN (Gluetun) variables
 - Established `.env.template-readme.md` to document expected variable groups per stack
 - Added Makefile to facilitate modular stack lifecycle management (start, stop, pull, logs)
+- Scaffolded `Makefile` with support for `up`, `down`, `logs`, and `rebuild` per stack
+- Created poller subdirectory for UniFi Poller containers (`unpoller-aphrodite.yml`, `unpoller-cronus.yml`)
+- Created `telegraf-configs/` for stack-specific telemetry configurations
 
 ### Changed
 - Renamed `.env.template` to `.env.template-readme.md` and clarified purpose
 - Deleted legacy `media-stack.yml` environment references; updated `plex-stack.yml` accordingly
 - Validated Unifi Poller integration with InfluxDB using token-based auth
 - Verified hardcoded variable fallback when `.env` is omitted from stack context
+- Modularized former `telemetry-stack.yml` into separate `core-monitoring.yml` and service-specific pollers and telegraf configs
+- Renamed `media-stack.yml` to `plex-stack.yml` to reflect its exclusive role in Plex and NZB/media automation
+- Created `env-templates/` and `envs/` directories to separate shared environment variable templates from live credentials
+- Split previously unified `.env` into stack-specific `.env` files
+- Rewrote `README.md` to reflect updated architecture, stacks, and service layout
+- Added `.gitignore` rules to exclude `envs/` directory
+- Updated VSCode project structure and environment management to reflect stack-scoped variables
 
 ### Notes
 - Project now supports multiple `.env` files scoped per stack, with `.envs` directory excluded via `.gitignore`
