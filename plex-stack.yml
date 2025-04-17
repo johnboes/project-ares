@@ -1,5 +1,7 @@
+# Plex Media Stack: Orchestrates media streaming, downloading, and management services
 version: "3.9"
 services:
+  # Plex: Media streaming server for organizing and delivering media content.
   plex:
     image: linuxserver/plex
     container_name: plex
@@ -20,6 +22,7 @@ services:
       - tds_net
     restart: unless-stopped
 
+  # NZBGet: Usenet downloader for automated media file acquisition.
   nzbget:
     image: linuxserver/nzbget
     container_name: nzbget
@@ -35,6 +38,7 @@ services:
       - /volume1/docker/nzbget/downloads:/downloads
     restart: unless-stopped
 
+  # Radarr: Automated movie downloader and organizer.
   radarr:
     image: linuxserver/radarr
     container_name: radarr
@@ -53,6 +57,7 @@ services:
       - tds_net
     restart: unless-stopped
 
+  # Sonarr: Automated TV series downloader and organizer.
   sonarr:
     image: linuxserver/sonarr
     container_name: sonarr
@@ -71,6 +76,7 @@ services:
       - tds_net
     restart: unless-stopped
 
+  # Readarr: Automated eBook downloader and organizer.
   readarr:
     image: lscr.io/linuxserver/readarr:develop
     container_name: readarr
@@ -89,6 +95,7 @@ services:
       - tds_net
     restart: unless-stopped
 
+  # Prowlarr: Indexer manager integrating with media downloaders.
   prowlarr:
     image: lscr.io/linuxserver/prowlarr
     container_name: prowlarr
@@ -105,6 +112,7 @@ services:
       - tds_net
     restart: unless-stopped
 
+  # Tautulli: Monitoring and analytics for Plex server usage.
   tautulli:
     image: linuxserver/tautulli
     container_name: tautulli
@@ -122,6 +130,7 @@ services:
       - tds_net
     restart: unless-stopped
 
+  # Overseerr: Request management interface for media content.
   overseerr:
     image: sctx/overseerr
     container_name: overseerr
@@ -139,6 +148,7 @@ services:
       - tds_net
     restart: unless-stopped
 
+  # Watchtower: Automated container update manager.
   watchtower:
     image: containrrr/watchtower
     container_name: watchtower
@@ -151,6 +161,7 @@ services:
       - tds_net
     restart: unless-stopped
 
+  # Gluetun: VPN container providing secure network routing for dependent services.
   gluetun:
     image: qmcgaw/gluetun
     container_name: gluetun

@@ -1,0 +1,79 @@
+version: "3.9"
+# This Docker Compose file defines the telemetry stack services and their configurations.
+
+services:
+  # InfluxDB service: A time-series database for storing telemetry data.
+  # Volumes are mapped for persistent data and configuration.
+  # Port 8086 is exposed for the InfluxDB API.
+  influxdb:
+    image: influxdb:2.7  # Using InfluxDB version 2.7.
+    container_name: influxdb
+    environment:
+      - TZ=${TZ}
+    volumes:
+      - /volume1/docker/influxdb/data:/var/lib/influxdb2  # Persistent storage for data.
+      - /volume1/docker/influxdb/config:/etc/influxdb2   # Configuration files.
+    ports:
+      - "8086:8086"  # Exposes InfluxDB API on host port 8086.
+    networks:
+      - tds_net
+    restart: unless-stopped  # Automatically restart unless explicitly stopped.
+
+  # Grafana service: Provides dashboards and visualization for telemetry data.
+  grafana:
+    image: grafana/grafana-oss  # Using the open source Grafana image.
+    container_name: grafana
+    environment:
+      - TZ=${TZ}
+      - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
+    volumes:
+      - /volume1/docker/grafana:/var/lib/grafana  # Persists dashboards and settings.
+    ports:
+      - "3000:3000"  # Exposes Grafana on host port 3000.
+    networks:
+      - tds_net
+    restart: unless-stopped  # Ensures Grafana restarts automatically.
+
+  # Prometheus service: Monitors systems and stores time-series metrics.
+  prometheus:
+    image: prom/prometheus  # Official Prometheus image.
+    container_name: prometheus
+    volumes:
+      - /volume1/docker/prometheus/config:/etc/prometheus  # Configuration files.
+      - /volume1/docker/prometheus/data:/prometheus          # Persistent storage for metrics.
+    ports:
+      - "9090:9090"  # Exposes Prometheus UI on host port 9090.
+    networks:
+      - tds_net
+    restart: unless-stopped  # Automatically restart Prometheus.
+
+  # Cloudflared service: Manages secure tunnels for external access via Cloudflare.
+  cloudflared:
+    image: cloudflare/cloudflared:latest  # Latest image for tunnel management.
+    container_name: cloudflared
+    command: tunnel run  # Starts the tunnel using the provided token.
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}  # Authenticates the tunnel.
+    restart: unless-stopped  # Ensures the tunnel service remains active.
+    networks:
+      - tds_net
+
+  # Git Webhook service: Listens for repository events to trigger automated actions.
+  git-webhook:
+    image: almir/webhook  # Lightweight webhook listener.
+    container_name: git-webhook
+    volumes:
+      - /volume1/docker/git-webhook/hooks:/etc/webhook  # Mounts webhook configuration files.
+      - /volume1/docker/infra-docker-stacks:/repo           # Provides repository context.
+    working_dir: /repo  # Sets working directory to repository root.
+    command: -hooks=/etc/webhook/hooks.json -verbose -port 9000  # Starts webhook with specified configuration.
+    ports:
+      - "9000:9000"  # Exposes webhook service on host port 9000.
+    restart: unless-stopped  # Automatically restart the webhook service.
+    networks:
+      - tds_net
+
+networks:
+  tds_net:
+    external: true  # Uses an external network for inter-service communication.
