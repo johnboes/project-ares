@@ -11,6 +11,25 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - [Planned] Enable multi-region WireGuard failover with dynamic Gluetun config
 - [Planned] Replace `.env` secret loading with dynamic vault-sourced injection
 
+### Added
+- Created `core-monitoring.yml` to house foundational monitoring services: Grafana, InfluxDB, Prometheus, Cloudflared, and Git Webhook
+- Migrated previously combined telemetry services out of `telemetry-stack.yml` into `core-monitoring.yml` for modular clarity
+- Added `.envs/` directory to separate environment variables across stack domains
+- Added `core-monitoring.env` for metrics infrastructure credentials
+- Added `plex-stack.env` for Plex-specific and VPN (Gluetun) variables
+- Established `.env.template-readme.md` to document expected variable groups per stack
+- Added Makefile to facilitate modular stack lifecycle management (start, stop, pull, logs)
+
+### Changed
+- Renamed `.env.template` to `.env.template-readme.md` and clarified purpose
+- Deleted legacy `media-stack.yml` environment references; updated `plex-stack.yml` accordingly
+- Validated Unifi Poller integration with InfluxDB using token-based auth
+- Verified hardcoded variable fallback when `.env` is omitted from stack context
+
+### Notes
+- Project now supports multiple `.env` files scoped per stack, with `.envs` directory excluded via `.gitignore`
+- New Makefile enables scoped docker-compose operations (`make core`, `make plex`, etc.)
+
 ---
 
 ## [v1.2.0] – 2025-04-13

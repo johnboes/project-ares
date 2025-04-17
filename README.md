@@ -8,7 +8,7 @@ This repository contains my complete Docker Compose infrastructure for automatin
 
 ## 🧱 Stack Overview
 
-### `media-stack.yml`
+### `plex-stack.yml`
 Automates and organizes Plex-compatible media:
 
 | Service     | Purpose                                       |
@@ -27,7 +27,7 @@ All media services are containerized and isolated on a shared custom network `td
 
 ---
 
-### `telemetry-stack.yml`
+### `core-monitoring.yml`
 Provides complete infrastructure and network health telemetry:
 
 | Service         | Purpose                                                  |
@@ -35,8 +35,6 @@ Provides complete infrastructure and network health telemetry:
 | **Grafana**     | Dashboard frontend for metrics and logs                  |
 | **InfluxDB 2**  | Time-series database for system stats and monitoring     |
 | **Prometheus**  | Exporter collector (optional depending on exporter needs)|
-| **Telegraf**    | Agent to collect system metrics across all NAS systems   |
-| **Unifi Poller**| Tracks UDM Pro and UniFi switches/APs                    |
 | **Cloudflared** | Tunnel service exposing dashboards securely              |
 | **Watchtower**  | Auto-updates for this stack                              |
 | **Git Webhook** | Enables auto-pull from GitHub main branch on push       |
@@ -61,7 +59,7 @@ I use [Cloudflare Tunnels](https://developers.cloudflare.com/cloudflare-one/conn
 3. I created a hostname like `media.tartarusonline.work` and routed it to `http://overseerr:5055`.
 4. Overseerr is now publicly available but remains protected by Cloudflare Access policies.
 
-This config is located in the `telemetry-stack.yml` and requires a working tunnel token added to your `.env`.
+This config is located in the `core-monitoring.yml` and requires a working tunnel token added to your `.env`.
 
 ---
 
@@ -83,9 +81,31 @@ This config is located in the `telemetry-stack.yml` and requires a working tunne
 A GitHub webhook is configured to call a secure endpoint exposed via Cloudflare Tunnel. When changes are pushed to the `main` branch, the webhook triggers an update on the server and automatically pulls the latest version of the repo into production.
 
 This is powered by:
-- The `git-webhook` container defined in `telemetry-stack.yml`
+- The `git-webhook` container defined in `core-monitoring.yml`
 - A custom shell script stored at `/volume1/docker/git-webhook/hooks/git-pull.sh`
 - A `hooks.json` configuration mounted into `/etc/webhook/` inside the container
+
+---
+
+## 🧩 Stack Structure and Naming
+
+This repository is organized into modular stack files. Each `*.yml` defines a purpose-driven group of services. For example:
+
+- `plex-stack.yml` handles all media automation and Plex-related services
+- `core-monitoring.yml` runs central observability tools like Grafana and InfluxDB
+- Future `.yml` files under `pollers/` will track regional devices like UniFi or Synology metrics using Telegraf or Unifi Poller
+
+---
+
+## 🔧 Makefile Commands
+
+The following commands are available via `make` to streamline development:
+
+- `make up-core` – Start core monitoring stack using `core-monitoring.env`
+- `make up-plex` – Start Plex/media stack using `plex-stack.env`
+- `make down-core` – Stop core stack
+- `make logs-plex` – View logs from Plex/media services
+- `make rebuild-plex` – Force rebuild of Plex stack
 
 ---
 
@@ -105,8 +125,12 @@ This setup follows InfoSec best practices and would meet expectations under SOC 
 
 ```text
 infra-docker-stacks/
-├── media-stack.yml
-├── telemetry-stack.yml
+├── plex-stack.yml
+├── core-monitoring.yml
+├── Makefile
+├── .envs/
+│   ├── core-monitoring.env
+│   └── plex-stack.env
 ├── .env.template
 └── README.md
 
@@ -122,8 +146,6 @@ infra-docker-stacks/
 ├── influxdb/
 ├── grafana/
 ├── prometheus/
-├── telegraf/
-├── unifi-poller/
 ├── cloudflared/
 ├── git-webhook/
 └── watchtower/
@@ -133,32 +155,9 @@ infra-docker-stacks/
 
 ## 📄 Environment Variables Template
 
-```
-TZ=
-PUID=
-PGID=
+Environment variables are now stored in per-stack `.env` files located in the `.envs/` folder. Use `.env.template` as a base.
 
-# Plex
-PLEX_CLAIM=
-
-# InfluxDB
-INFLUXDB_URL=
-INFLUXDB_ORG=
-INFLUXDB_BUCKET=
-INFLUXDB_TOKEN=
-
-# Unifi Poller
-UP_UNIFI_DEFAULT_USER=
-UP_UNIFI_DEFAULT_PASS=
-UP_UNIFI_DEFAULT_URL=
-
-# Grafana
-GF_SECURITY_ADMIN_USER=
-GF_SECURITY_ADMIN_PASSWORD=
-
-# Cloudflare Tunnel
-CLOUDFLARE_TUNNEL_TOKEN=
-```
+Example: `plex-stack.env`, `core-monitoring.env`
 
 ---
 
