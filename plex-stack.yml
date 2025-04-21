@@ -1,4 +1,3 @@
-# Plex Media Stack: Orchestrates media streaming, downloading, and management services
 version: "3.9"
 services:
   # Plex: Media streaming server for organizing and delivering media content.
@@ -10,7 +9,6 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
-      - VERSION=docker
       - PLEX_CLAIM=${PLEX_CLAIM}
     volumes:
       - /volume1/docker/plex/config:/config
@@ -175,6 +173,10 @@ services:
       - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
       - WIREGUARD_ADDRESSES=${WIREGUARD_ADDRESSES}
       - TZ=${TZ}
+      - BLOCK_IPV6=${BLOCK_IPV6}
+      - SERVER_CITIES=${SERVER_CITIES}
+      - DOT_PROVIDERS=${DOT_PROVIDERS}
+      - MTU=${MTU}
     volumes:
       - /volume1/docker/gluetun:/gluetun
     ports:
