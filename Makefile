@@ -22,3 +22,16 @@ logs-plex:
 
 rebuild-plex:
 	docker compose --env-file .envs/plex-stack.env -f plex-stack.yml up -d --build --force-recreate
+
+# --- Calibre Stack ---
+up-calibre:
+	docker compose --env-file .env -f calibre-stack.yml up -d
+
+down-calibre:
+	docker compose --env-file .env -f calibre-stack.yml down
+
+logs-calibre:
+	docker compose --env-file .env -f calibre-stack.yml logs -f
+
+rebuild-calibre:
+	docker compose --env-file .env -f calibre-stack.yml up -d --build --force-recreate

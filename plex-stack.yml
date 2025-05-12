@@ -76,7 +76,7 @@ services:
 
   # Readarr: Automated eBook downloader and organizer.
   readarr:
-    image: lscr.io/linuxserver/readarr:develop
+    image: hotio/readarr:nightly
     container_name: readarr
     hostname: readarr
     environment:
@@ -87,6 +87,7 @@ services:
       - /volume1/docker/readarr/config:/config
       - /volume1/docker/nzbget/downloads:/downloads
       - /volume2/plex-media/readarr:/books
+      - /volume2/plex-media/calibre-library:/calibre-library
     ports:
       - "8787:8787"
     networks:
@@ -181,6 +182,43 @@ services:
       - /volume1/docker/gluetun:/gluetun
     ports:
       - 8112:8112 # Optional if using web interface of routed container (e.g., Deluge)
+    networks:
+      - tds_net
+    restart: unless-stopped
+
+  tdarr:
+    image: ghcr.io/haveagitgat/tdarr:latest
+    container_name: tdarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - /volume1/docker/tdarr/server:/app/server
+      - /volume1/docker/tdarr/configs:/app/configs
+      - /volume1/docker/tdarr/logs:/app/logs
+      - /volume2/plex-media:/media
+    ports:
+      - "8265:8265"
+      - "8266:8266"
+    networks:
+      - tds_net
+    restart: unless-stopped
+
+  tdarr_node:
+    image: ghcr.io/haveagitgat/tdarr_node:latest
+    container_name: tdarr_node
+    depends_on:
+      - tdarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - TDARR_SERVER=tdarr
+    volumes:
+      - /volume1/docker/tdarr/configs:/app/configs
+      - /volume1/docker/tdarr/logs:/app/logs
+      - /volume2/plex-media:/media
     networks:
       - tds_net
     restart: unless-stopped
