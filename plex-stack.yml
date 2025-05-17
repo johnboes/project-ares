@@ -9,11 +9,11 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
-      - PLEX_CLAIM=${PLEX_CLAIM}
     volumes:
       - /volume1/docker/plex/config:/config
       - /volume1/docker/plex/transcode:/transcode
-      - /volume2/plex-media:/media:ro
+      - /volume2/media:/media
+
     ports:
       - "32400:32400"
     networks:
@@ -24,9 +24,6 @@ services:
   nzbget:
     image: linuxserver/nzbget
     container_name: nzbget
-    network_mode: "service:gluetun"
-    depends_on:
-      - gluetun
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -34,6 +31,37 @@ services:
     volumes:
       - /volume1/docker/nzbget/config:/config
       - /volume1/docker/nzbget/downloads:/downloads
+    ports:
+      - "6789:6789"
+    networks:
+      - tds_net
+    restart: unless-stopped
+
+  # Gluetun: VPN container providing secure network routing for dependent services.
+  gluetun:
+    image: qmcgaw/gluetun
+    container_name: gluetun
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun
+    environment:
+      - VPN_SERVICE_PROVIDER=${VPN_SERVICE_PROVIDER}
+      - VPN_TYPE=${VPN_TYPE}
+      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
+      - WIREGUARD_ADDRESSES=${WIREGUARD_ADDRESSES}
+      - TZ=${TZ}
+      - BLOCK_IPV6=${BLOCK_IPV6}
+      - SERVER_CITIES=${SERVER_CITIES}
+      - DOT_PROVIDERS=${DOT_PROVIDERS}
+      - MTU=${MTU}
+      
+    volumes:
+      - /volume1/docker/gluetun:/gluetun
+    ports:
+      - 8112:8112
+    networks:
+      - tds_net
     restart: unless-stopped
 
   # Radarr: Automated movie downloader and organizer.
@@ -48,7 +76,8 @@ services:
     volumes:
       - /volume1/docker/radarr/config:/config
       - /volume1/docker/nzbget/downloads:/downloads
-      - /volume2/plex-media/plex-movies:/movies
+      - /volume2/media/movies:/movies
+      - /volume2/media/prometheus-media/movies:/prometheus-media/movies
     ports:
       - "7878:7878"
     networks:
@@ -67,7 +96,8 @@ services:
     volumes:
       - /volume1/docker/sonarr/config:/config
       - /volume1/docker/nzbget/downloads:/downloads
-      - /volume2/plex-media/plex-tv:/tv
+      - /volume2/media/tv:/tv
+      - /volume2/media/prometheus-media/tv:/prometheus-media/tv
     ports:
       - "8989:8989"
     networks:
@@ -86,8 +116,8 @@ services:
     volumes:
       - /volume1/docker/readarr/config:/config
       - /volume1/docker/nzbget/downloads:/downloads
-      - /volume2/plex-media/readarr:/books
-      - /volume2/plex-media/calibre-library:/calibre-library
+      - /volume2/media/books:/books
+      - /volume2/media/books-dump:/books-dump
     ports:
       - "8787:8787"
     networks:
@@ -160,32 +190,6 @@ services:
       - tds_net
     restart: unless-stopped
 
-  # Gluetun: VPN container providing secure network routing for dependent services.
-  gluetun:
-    image: qmcgaw/gluetun
-    container_name: gluetun
-    cap_add:
-      - NET_ADMIN
-    devices:
-      - /dev/net/tun
-    environment:
-      - VPN_SERVICE_PROVIDER=mullvad
-      - VPN_TYPE=wireguard
-      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
-      - WIREGUARD_ADDRESSES=${WIREGUARD_ADDRESSES}
-      - TZ=${TZ}
-      - BLOCK_IPV6=${BLOCK_IPV6}
-      - SERVER_CITIES=${SERVER_CITIES}
-      - DOT_PROVIDERS=${DOT_PROVIDERS}
-      - MTU=${MTU}
-    volumes:
-      - /volume1/docker/gluetun:/gluetun
-    ports:
-      - 8112:8112 # Optional if using web interface of routed container (e.g., Deluge)
-    networks:
-      - tds_net
-    restart: unless-stopped
-
   tdarr:
     image: ghcr.io/haveagitgat/tdarr:latest
     container_name: tdarr
@@ -197,7 +201,7 @@ services:
       - /volume1/docker/tdarr/server:/app/server
       - /volume1/docker/tdarr/configs:/app/configs
       - /volume1/docker/tdarr/logs:/app/logs
-      - /volume2/plex-media:/media
+      - /volume2/media:/media
     ports:
       - "8265:8265"
       - "8266:8266"
@@ -218,7 +222,7 @@ services:
     volumes:
       - /volume1/docker/tdarr/configs:/app/configs
       - /volume1/docker/tdarr/logs:/app/logs
-      - /volume2/plex-media:/media
+      - /volume2/media:/media
     networks:
       - tds_net
     restart: unless-stopped
