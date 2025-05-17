@@ -6,14 +6,16 @@ services:
     container_name: calibre
     volumes:
       - ../calibre/config:/config
-      - /volume2/plex-media/calibre-library:/books
+      - /volume2/media/books:/books
+      - /volume2/media/books-dump:/books-dump
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
     ports:
-      - 8082:8080
-      - 8083:8181
+      - 8082:8080 #Calibre main GUI
+      - 8083:8181 # Calibre-web
+      - 8081:8081  # Calibre Content Server
     restart: unless-stopped
 
   calibre-web:
@@ -22,7 +24,7 @@ services:
     depends_on:
       - calibre
     volumes:
-      - /volume2/plex-media/calibre-library:/books
+      - /volume2/media/books:/books
       - ../calibre-web/config:/config
     environment:
       - PUID=${PUID}
