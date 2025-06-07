@@ -104,22 +104,22 @@ services:
       - tds_net
     restart: unless-stopped
 
-  # Readarr: Automated eBook downloader and organizer.
-  readarr:
+  speakarr:
     image: hotio/readarr:nightly
-    container_name: readarr
-    hostname: readarr
+    container_name: speakarr
+    hostname: speakarr
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
     volumes:
-      - /volume1/docker/readarr/config:/config
+      - /volume1/docker/speakarr/config:/config
       - /volume1/docker/nzbget/downloads:/downloads
-      - /volume2/media/books:/books
-      - /volume2/media/books-dump:/books-dump
+      - /volume1/docker/calibre/scripts:/scripts
+      - /volume2/media/audiobooks:/audiobooks
+      - /volume2/media/audiobooks-dump:/audiobooks-dump
     ports:
-      - "8787:8787"
+      - "8788:8787"
     networks:
       - tds_net
     restart: unless-stopped

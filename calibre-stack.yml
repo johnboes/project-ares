@@ -8,6 +8,8 @@ services:
       - ../calibre/config:/config
       - /volume2/media/books:/books
       - /volume2/media/books-dump:/books-dump
+      - /volume2/media/books-staging:/books-staging
+      - /volume1/docker/calibre/scripts:/scripts
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -34,3 +36,28 @@ services:
     ports:
       - 8084:8083
     restart: unless-stopped
+
+  readarr:
+    image: hotio/readarr:nightly
+    container_name: readarr
+    hostname: readarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - /volume1/docker/readarr/config:/config
+      - /volume1/docker/nzbget/downloads:/downloads
+      - /volume1/docker/calibre/scripts:/scripts
+      - /volume2/media/books:/books
+      - /volume2/media/books-dump:/books-dump
+      - /volume2/media/books-staging:/books-staging
+    ports:
+      - "8787:8787"
+    networks:
+      - tds_net
+    restart: unless-stopped
+
+networks:
+  tds_net:
+    external: true
