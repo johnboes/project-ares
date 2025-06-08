@@ -1,4 +1,4 @@
-version: "3.9"
+
 services:
   # Plex: Media streaming server for organizing and delivering media content.
   plex:
@@ -16,6 +16,16 @@ services:
 
     ports:
       - "32400:32400"
+    networks:
+      - tds_net
+    restart: unless-stopped
+
+  # Telegraf: Metrics collection agent for monitoring Plex server performance.
+  telegraf-plex:
+    image: telegraf:latest
+    container_name: telegraf-plex
+    volumes:
+      - /volume1/docker/infra-docker-stacks/telegraf-configs/telegraf-plex.conf:/etc/telegraf/telegraf.conf:ro
     networks:
       - tds_net
     restart: unless-stopped

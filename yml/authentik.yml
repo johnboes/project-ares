@@ -1,0 +1,35 @@
+services:
+  authentik:
+    image: ghcr.io/goauthentik/server:2024.4.2
+    container_name: authentik
+    restart: unless-stopped
+    environment:
+      AUTHENTIK_SECRET_KEY: your-super-secret-key
+      AUTHENTIK_ERROR_REPORTING__ENABLED: "false"
+      AUTHENTIK_POSTGRESQL__HOST: db
+      AUTHENTIK_POSTGRESQL__USER: authentik
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD: authentikpass
+      AUTHENTIK_REDIS__HOST: redis
+    volumes:
+      - /volume1/docker/authentik/media:/media
+      - /volume1/docker/authentik/custom-templates:/templates
+    ports:
+      - "8443:9443"
+      - "9000:9000" # management UI
+
+  db:
+    image: postgres:15
+    container_name: authentik-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: authentikpass
+      POSTGRES_USER: authentik
+      POSTGRES_DB: authentik
+    volumes:
+      - /volume1/docker/authentik/postgresql:/var/lib/postgresql/data
+
+  redis:
+    image: redis:alpine
+    container_name: authentik-redis
+    restart: unless-stopped
