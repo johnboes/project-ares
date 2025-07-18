@@ -17,7 +17,7 @@ services:
     ports:
       - "32400:32400"
     networks:
-      - tds_net
+      - media_net
     restart: unless-stopped
 
   # NZBGet: Usenet downloader for automated media file acquisition.
@@ -34,7 +34,7 @@ services:
     ports:
       - "6789:6789"
     networks:
-      - tds_net
+      - media_net
     restart: unless-stopped
 
   # Gluetun: VPN container providing secure network routing for dependent services.
@@ -61,7 +61,7 @@ services:
     ports:
       - 8112:8112
     networks:
-      - tds_net
+      - media_net
     restart: unless-stopped
 
   # Radarr: Automated movie downloader and organizer.
@@ -81,7 +81,7 @@ services:
     ports:
       - "7878:7878"
     networks:
-      - tds_net
+      - media_net
     restart: unless-stopped
 
   # Sonarr: Automated TV series downloader and organizer.
@@ -101,7 +101,7 @@ services:
     ports:
       - "8989:8989"
     networks:
-      - tds_net
+      - media_net
     restart: unless-stopped
 
   speakarr:
@@ -121,7 +121,7 @@ services:
     ports:
       - "8788:8787"
     networks:
-      - tds_net
+      - media_net
     restart: unless-stopped
 
   # Prowlarr: Indexer manager integrating with media downloaders.
@@ -138,7 +138,7 @@ services:
     ports:
       - "9696:9696"
     networks:
-      - tds_net
+      - media_net
     restart: unless-stopped
 
   # Tautulli: Monitoring and analytics for Plex server usage.
@@ -156,7 +156,7 @@ services:
     ports:
       - "8181:8181"
     networks:
-      - tds_net
+      - media_net
     restart: unless-stopped
 
   # Overseerr: Request management interface for media content.
@@ -174,7 +174,7 @@ services:
     volumes:
       - /volume1/docker/overseerr/config:/app/config
     networks:
-      - tds_net
+      - media_net
     restart: unless-stopped
 
   # Watchtower: Automated container update manager.
@@ -187,7 +187,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
-      - tds_net
+      - media_net
     restart: unless-stopped
 
   tdarr:
@@ -206,7 +206,7 @@ services:
       - "8265:8265"
       - "8266:8266"
     networks:
-      - tds_net
+      - media_net
     restart: unless-stopped
 
   tdarr_node:
@@ -224,9 +224,9 @@ services:
       - /volume1/docker/tdarr/logs:/app/logs
       - /volume2/media:/media
     networks:
-      - tds_net
+      - media_net
     restart: unless-stopped
 
 networks:
-  tds_net:
+  media_net:
     external: true

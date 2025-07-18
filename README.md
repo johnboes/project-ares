@@ -1,20 +1,21 @@
 # Project Ares
 
-Project Ares is a modular Docker Compose infrastructure running on a Synology RS1221+ server (`Ares`). It is designed to automate media ingestion, enable secure remote access, and provide full-stack observability across home networks and hardware using open-source telemetry tooling.
-
-This system acts as a self-hosted, fully Usenet-enabled Plex media server, VPN-cloaked downloader, and multi-site network observer. It collects system and network telemetry from Synology servers, Plex performance data, and UniFi Dream Machine metrics across two physical locations (NYC and VA).
-
 > ✅ Docker Version: `24.0.7` using Compose v2 syntax  
 > 🌐 Secure Access via Cloudflare Zero Trust
+
+---
+
+## 📖 Project Description
+
+Project Ares is a modular Docker Compose infrastructure running on a Synology RS1221+ server (`Ares`). It is designed to automate media ingestion, ebook management, enable secure remote access, provide full-stack observability, and simplify infrastructure management across home networks and hardware using open-source telemetry tooling.
+
+This system acts as a self-hosted, fully Usenet-enabled Plex media server, VPN-cloaked downloader, multi-site network observer, ebook library (Calibre, Calibre-web, Readarr), secure public access gateway (Cloudflare Tunnel), and infrastructure manager (Portainer). It collects system and network telemetry from Synology servers, Plex performance data, and UniFi Dream Machine metrics across two physical locations (NYC and VA).
 
 ---
 
 ## 🧱 Stack Overview
 
 ### `plex-stack.yml`
-
-Orchestrates automated media ingestion, Plex service delivery, and telemetry integrations.
-
 | Service         | Purpose                                               |
 |----------------|--------------------------------------------------------|
 | Plex            | Media playback and library management                 |
@@ -27,15 +28,13 @@ Orchestrates automated media ingestion, Plex service delivery, and telemetry int
 | Overseerr       | Public-facing media request frontend                  |
 | Watchtower      | Container auto-updater                                |
 | Gluetun (VPN)   | WireGuard proxy for anonymized Usenet traffic         |
+| Portainer       | Docker infrastructure management UI                   |
 
-All containers share the `tds_net` network and mount to a structured folder tree under `/volume1/docker`. Download and storage volumes are mapped for Plex compatibility and performance.
+All containers use the `media_net` network and mount to a structured folder tree under `/volume1/docker`. Download and storage volumes are mapped for Plex compatibility and performance.
 
 ---
 
 ### `core-monitoring.yml`
-
-Captures system metrics, network telemetry, and exposes dashboards securely via Cloudflare:
-
 | Service         | Purpose                                                 |
 |----------------|----------------------------------------------------------|
 | Grafana         | Metrics dashboards and visualizations                   |
@@ -49,93 +48,104 @@ Designed to observe and monitor infrastructure across multiple LANs with full TL
 
 ---
 
+### `calibre-stack.yml`
+Orchestrates ebook management and automation services:
+
+| Service         | Purpose                                               |
+|----------------|--------------------------------------------------------|
+| Calibre        | Ebook library management and conversion                |
+| Calibre-web    | Web frontend for Calibre library                       |
+| Readarr        | Ebook and audiobook automation (Usenet integration)    |
+
+All containers use the `books_net` network and mount to structured folders for books, configs, and scripts. Designed for seamless ebook ingestion and integration with the rest of the media stack.
+
+---
+
+## 🚦 First-Time Setup
+
+Before launching any stacks, create the required Docker networks (only needed once per host):
+
+```sh
+docker network create media_net
+docker network create books_net
+docker network create monitoring_net
+```
+
+---
+
 ## 🚀 Getting Started
 
 ### Prerequisites
-
 - Docker `24.x`
 - Docker Compose v2
 - Synology DSM with SSH access
 - `make` installed (optional but recommended)
 
 ### Initial Setup
-
 1. Clone this repo:
    ```bash
    git clone https://github.com/your-user/infra-docker-stacks.git
    cd infra-docker-stacks
    ```
-
-2. Create `.env` files from templates:
+2. Create your `.env` file from the template:
    ```bash
-   cp env-templates/core-monitoring.env.template envs/core-monitoring.env
-   cp env-templates/plex-stack.env.template envs/plex-stack.env
+   cp env-templates/infra-docker-stacks.env.template .env
    ```
-
-3. Modify those `.env` files with your credentials, tokens, and secrets.
-
-4. Launch the stack:
+3. Modify `.env` with your credentials, tokens, and secrets.
+4. Launch the stack(s):
    ```bash
    make up-core
    make up-plex
+   make up-calibre   # (optional) Start ebook stack
    ```
-
 5. (Optional) Add more pollers or Telegraf agents by copying and configuring `.yml` + `.conf` files.
 
 ---
 
-## 🔒 Zero Trust Public Access
+## 🗂 File Structure
 
-Cloudflare Tunnel allows you to expose services like Overseerr or Grafana without opening ports.
-
-### Key Advantages:
-- No port forwarding or firewall rules
-- End-to-end HTTPS (TLS)
-- Identity-based access via Cloudflare Access
-- Obfuscated origin and IPs
-
-Note: Cloudflare Access policies must be configured via the Zero Trust dashboard at [dash.teams.cloudflare.com](https://dash.teams.cloudflare.com).
-
----
-
-## 📡 Telemetry Coverage
-
-Metrics are collected from:
-
-- 3 Synology NAS devices (using Telegraf)
-- 1 Plex server (via Tautulli)
-- 2 UniFi gateways (UDM Pro, UDM Base) using UniFi Poller
-- Containerized apps and resource usage
-- InfluxDB serves as a unified telemetry sink
-
-Each Telegraf or UniFi Poller instance is defined in its own `.yml` and `.env` file for modularization and clarity.
-
----
-
-## 🧩 Stack Modularity
-
-This repo is structured for maintainability:
-
-- `core-monitoring.yml` – Central observability services
-- `plex-stack.yml` – Media ingestion and playback services
-- `pollers/` – Individual telemetry collectors for remote endpoints
-- `telegraf-configs/` – INI configs for Telegraf agents
-- `env-templates/` – Template `.env` files for onboarding
-- `envs/` – Real, git-ignored `.env` files per stack
-
----
-
-## 🧰 Makefile Commands
-
-To streamline stack orchestration:
-
-```bash
-make up-core          # Start core monitoring stack
-make up-plex          # Start Plex/media services
-make down-core        # Stop monitoring stack
-make logs-plex        # Tail logs from Plex services
-make rebuild-plex     # Rebuild Plex/media containers
+```text
+project-ares/
+├── core-monitoring.yml
+├── plex-stack.yml
+├── calibre-stack.yml
+├── pollers/
+│   ├── unpoller-cronus.yml
+│   └── unpoller-aphrodite.yml
+├── telegraf-configs/
+│   ├── telegraf-ares.conf
+│   ├── telegraf-cerberus.conf
+│   ├── telegraf-plex.conf
+│   └── telegraf-prometheus.conf
+├── env-templates/
+│   ├── infra-docker-stacks.env.template
+│   └── README.md
+├── infra-docker-stacks.env
+├── Makefile
+├── .gitignore
+├── README.md
+├── CHANGELOG.md
+└── portainer-data/   # (if using Portainer)
 ```
+
+---
+
+## 📝 Notes & Tips
+
+- **Customizing Volume Paths:**
+  - The Compose files assume certain volume paths (e.g., `/volume1/docker/plex/config`). Adjust these as needed for your environment.
+- **Multi-Network Services:**
+  - If a service needs to communicate across stacks, you can attach it to multiple networks. Example:
+    ```yaml
+    readarr:
+      networks:
+        - media_net
+        - books_net
+    ```
+- **Adding Pollers/Telegraf Agents:**
+  - To add a new poller or agent, copy a `.yml` and `.conf` file from the `pollers/` or `telegraf-configs/` directories, adjust as needed, and launch with Docker Compose.
+- **Environment Files:**
+  - By default, the Makefile uses a single `.env` file for all stacks. For advanced setups, you can use per-stack `.env` files by updating the Makefile and Compose commands accordingly.
 
 ---
 
@@ -148,34 +158,6 @@ make rebuild-plex     # Rebuild Plex/media containers
 - Zero-trust posture enforced across all public-facing services
 
 This structure aligns with SOC 2 Type II and ISO 27001 practices.
-
----
-
-## 🗂 File Structure
-
-```text
-infra-docker-stacks/
-├── core-monitoring.yml
-├── plex-stack.yml
-├── pollers/
-│   ├── unpoller-cronus.yml
-│   └── unpoller-aphrodite.yml
-├── telegraf-configs/
-│   ├── telegraf-ares.conf
-│   ├── telegraf-cerberus.conf
-│   └── telegraf-plex.conf
-├── env-templates/
-│   ├── core-monitoring.env.template
-│   └── plex-stack.env.template
-├── envs/
-│   ├── core-monitoring.env
-│   └── plex-stack.env
-├── Makefile
-├── .gitignore
-├── .env.template
-├── README.md
-└── CHANGELOG.md
-```
 
 ---
 

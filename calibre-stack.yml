@@ -55,9 +55,9 @@ services:
     ports:
       - "8787:8787"
     networks:
-      - tds_net
+      - books_net
     restart: unless-stopped
 
 networks:
-  tds_net:
+  books_net:
     external: true

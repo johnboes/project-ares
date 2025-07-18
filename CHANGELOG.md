@@ -6,6 +6,14 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [2025-05-12]
+### Updated
+- Added Calibre stack (`calibre-stack.yml`) for ebook management (Calibre, Calibre-web, Readarr)
+- Updated environment setup instructions to match available templates
+- Updated Makefile commands and file structure to reflect current repo state
+
+---
+
 ## [v1.0.0] – 2025-04-11
 
 ### Added
