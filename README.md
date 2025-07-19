@@ -89,7 +89,7 @@ docker network create monitoring_net
    ```
 2. Create your `.env` file from the template:
    ```bash
-   cp env-templates/infra-docker-stacks.env.template .env
+   cp .env.template .env
    ```
 3. Modify `.env` with your credentials, tokens, and secrets.
 4. Launch the stack(s):
@@ -117,9 +117,7 @@ project-ares/
 │   ├── telegraf-cerberus.conf
 │   ├── telegraf-plex.conf
 │   └── telegraf-prometheus.conf
-├── env-templates/
-│   ├── infra-docker-stacks.env.template
-│   └── README.md
+├── .env.template
 ├── infra-docker-stacks.env
 ├── Makefile
 ├── .gitignore

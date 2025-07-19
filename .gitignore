@@ -1,7 +1,9 @@
 # Environment and secrets
 .env
 .env.*
-*.env
+!*.env.template
+!*.env.example
+!*.env.sample
 envs/*.env
 *.local
 *.secret

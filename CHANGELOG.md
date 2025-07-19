@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Environment Templates**: Renamed `env-templates/infra-docker-stacks.env.template` to `.env.template` following industry standards
+- **Documentation**: Updated README.md to reflect new template structure and simplified setup instructions
+
 ### Planned
 - Read-only public dashboard view for Grafana
 - Multi-region WireGuard failover with dynamic Gluetun configuration

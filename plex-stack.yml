@@ -24,6 +24,9 @@ services:
   nzbget:
     image: linuxserver/nzbget
     container_name: nzbget
+    depends_on:
+      - gluetun
+    network_mode: service:gluetun
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -31,10 +34,6 @@ services:
     volumes:
       - /volume1/docker/nzbget/config:/config
       - /volume1/docker/nzbget/downloads:/downloads
-    ports:
-      - "6789:6789"
-    networks:
-      - media_net
     restart: unless-stopped
 
   # Gluetun: VPN container providing secure network routing for dependent services.
@@ -55,11 +54,14 @@ services:
       - SERVER_CITIES=${SERVER_CITIES}
       - DOT_PROVIDERS=${DOT_PROVIDERS}
       - MTU=${MTU}
+      - DNS_PLAINTEXT_ADDRESS=${DNS_PLAINTEXT_ADDRESS}
+      - FIREWALL_OUTBOUND_SUBNETS=0.0.0.0/0
       
     volumes:
       - /volume1/docker/gluetun:/gluetun
     ports:
       - 8112:8112
+      - 6789:6789  # NZBGet web interface through Gluetun
     networks:
       - media_net
     restart: unless-stopped
