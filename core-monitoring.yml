@@ -12,7 +12,7 @@ services:
     ports:
       - "8086:8086"
     networks:
-      - monitoring_net
+      - tds_net
     restart: unless-stopped
 
   grafana:
@@ -27,7 +27,7 @@ services:
     ports:
       - "3000:3000"
     networks:
-      - monitoring_net
+      - tds_net
     restart: unless-stopped
 
   prometheus:
@@ -39,7 +39,7 @@ services:
     ports:
       - "9090:9090"
     networks:
-      - monitoring_net
+      - tds_net
     restart: unless-stopped
 
   cloudflared:
@@ -52,8 +52,37 @@ services:
       - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
     restart: unless-stopped
     networks:
-      - monitoring_net
+      - tds_net
+
+  # Portainer: Docker infrastructure management UI
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: unless-stopped
+    ports:
+      - "9001:9000"
+      - "9443:9443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /volume1/docker/portainer:/data
+    networks:
+      - tds_net
+
+  # Homarr: Dashboard and application launcher
+  homarr:
+    image: ghcr.io/homarr-labs/homarr:latest
+    container_name: homarr
+    restart: unless-stopped
+    ports:
+      - "7575:7575"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /volume1/docker/homarr:/app/data
+    environment:
+      - SECRET_ENCRYPTION_KEY=${SECRET_ENCRYPTION_KEY}
+    networks:
+      - tds_net
 
 networks:
-  monitoring_net:
+  tds_net:
     external: true

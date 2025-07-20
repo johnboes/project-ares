@@ -13,20 +13,16 @@ services:
       - /volume1/docker/plex/config:/config
       - /volume1/docker/plex/transcode:/transcode
       - /volume2/media:/media
-
     ports:
       - "32400:32400"
     networks:
-      - media_net
+      - tds_net
     restart: unless-stopped
 
   # NZBGet: Usenet downloader for automated media file acquisition.
   nzbget:
     image: linuxserver/nzbget
     container_name: nzbget
-    depends_on:
-      - gluetun
-    network_mode: service:gluetun
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -34,6 +30,10 @@ services:
     volumes:
       - /volume1/docker/nzbget/config:/config
       - /volume1/docker/nzbget/downloads:/downloads
+    ports:
+      - "6789:6789"
+    networks:
+      - tds_net
     restart: unless-stopped
 
   # Gluetun: VPN container providing secure network routing for dependent services.
@@ -63,7 +63,7 @@ services:
       - 8112:8112
       - 6789:6789  # NZBGet web interface through Gluetun
     networks:
-      - media_net
+      - tds_net
     restart: unless-stopped
 
   # Radarr: Automated movie downloader and organizer.
@@ -83,7 +83,7 @@ services:
     ports:
       - "7878:7878"
     networks:
-      - media_net
+      - tds_net
     restart: unless-stopped
 
   # Sonarr: Automated TV series downloader and organizer.
@@ -103,7 +103,7 @@ services:
     ports:
       - "8989:8989"
     networks:
-      - media_net
+      - tds_net
     restart: unless-stopped
 
   speakarr:
@@ -123,7 +123,7 @@ services:
     ports:
       - "8788:8787"
     networks:
-      - media_net
+      - tds_net
     restart: unless-stopped
 
   # Prowlarr: Indexer manager integrating with media downloaders.
@@ -140,7 +140,7 @@ services:
     ports:
       - "9696:9696"
     networks:
-      - media_net
+      - tds_net
     restart: unless-stopped
 
   # Tautulli: Monitoring and analytics for Plex server usage.
@@ -158,7 +158,7 @@ services:
     ports:
       - "8181:8181"
     networks:
-      - media_net
+      - tds_net
     restart: unless-stopped
 
   # Overseerr: Request management interface for media content.
@@ -176,7 +176,7 @@ services:
     volumes:
       - /volume1/docker/overseerr/config:/app/config
     networks:
-      - media_net
+      - tds_net
     restart: unless-stopped
 
   # Watchtower: Automated container update manager.
@@ -189,7 +189,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
-      - media_net
+      - tds_net
     restart: unless-stopped
 
   tdarr:
@@ -208,7 +208,7 @@ services:
       - "8265:8265"
       - "8266:8266"
     networks:
-      - media_net
+      - tds_net
     restart: unless-stopped
 
   tdarr_node:
@@ -226,9 +226,9 @@ services:
       - /volume1/docker/tdarr/logs:/app/logs
       - /volume2/media:/media
     networks:
-      - media_net
+      - tds_net
     restart: unless-stopped
 
 networks:
-  media_net:
+  tds_net:
     external: true

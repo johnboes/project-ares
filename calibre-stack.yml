@@ -18,6 +18,8 @@ services:
       - 8082:8080 #Calibre main GUI
       - 8083:8181 # Calibre-web
       - 8081:8081  # Calibre Content Server
+    networks:
+      - tds_net
     restart: unless-stopped
 
   calibre-web:
@@ -35,6 +37,8 @@ services:
       - DOCKER_MODS=linuxserver/calibre-web:calibre
     ports:
       - 8084:8083
+    networks:
+      - tds_net
     restart: unless-stopped
 
   readarr:
@@ -55,9 +59,9 @@ services:
     ports:
       - "8787:8787"
     networks:
-      - books_net
+      - tds_net
     restart: unless-stopped
 
 networks:
-  books_net:
+  tds_net:
     external: true

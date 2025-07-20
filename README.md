@@ -30,7 +30,7 @@ This system acts as a self-hosted, fully Usenet-enabled Plex media server, VPN-c
 | Gluetun (VPN)   | WireGuard proxy for anonymized Usenet traffic         |
 | Portainer       | Docker infrastructure management UI                   |
 
-All containers use the `media_net` network and mount to a structured folder tree under `/volume1/docker`. Download and storage volumes are mapped for Plex compatibility and performance.
+All containers use the `tds_net` network and mount to a structured folder tree under `/volume1/docker`. Download and storage volumes are mapped for Plex compatibility and performance.
 
 ---
 
@@ -57,18 +57,16 @@ Orchestrates ebook management and automation services:
 | Calibre-web    | Web frontend for Calibre library                       |
 | Readarr        | Ebook and audiobook automation (Usenet integration)    |
 
-All containers use the `books_net` network and mount to structured folders for books, configs, and scripts. Designed for seamless ebook ingestion and integration with the rest of the media stack.
+All containers use the `tds_net` network and mount to structured folders for books, configs, and scripts. Designed for seamless ebook ingestion and integration with the rest of the media stack.
 
 ---
 
 ## 🚦 First-Time Setup
 
-Before launching any stacks, create the required Docker networks (only needed once per host):
+Before launching any stacks, create the required Docker network (only needed once per host):
 
 ```sh
-docker network create media_net
-docker network create books_net
-docker network create monitoring_net
+docker network create tds_net
 ```
 
 ---
@@ -91,6 +89,7 @@ docker network create monitoring_net
    ```bash
    cp .env.template .env
    ```
+   Note: A `.env` file already exists in the root directory.
 3. Modify `.env` with your credentials, tokens, and secrets.
 4. Launch the stack(s):
    ```bash
@@ -118,7 +117,7 @@ project-ares/
 │   ├── telegraf-plex.conf
 │   └── telegraf-prometheus.conf
 ├── .env.template
-├── infra-docker-stacks.env
+├── .env
 ├── Makefile
 ├── .gitignore
 ├── README.md
@@ -132,18 +131,14 @@ project-ares/
 
 - **Customizing Volume Paths:**
   - The Compose files assume certain volume paths (e.g., `/volume1/docker/plex/config`). Adjust these as needed for your environment.
-- **Multi-Network Services:**
-  - If a service needs to communicate across stacks, you can attach it to multiple networks. Example:
-    ```yaml
-    readarr:
-      networks:
-        - media_net
-        - books_net
-    ```
+- **Cross-Stack Communication:**
+  - All services use the unified `tds_net` network, enabling seamless communication across stacks.
+  - Services can reference volumes and communicate directly regardless of which stack they're in.
 - **Adding Pollers/Telegraf Agents:**
   - To add a new poller or agent, copy a `.yml` and `.conf` file from the `pollers/` or `telegraf-configs/` directories, adjust as needed, and launch with Docker Compose.
 - **Environment Files:**
-  - By default, the Makefile uses a single `.env` file for all stacks. For advanced setups, you can use per-stack `.env` files by updating the Makefile and Compose commands accordingly.
+  - The Makefile uses a single `.env` file in the root directory for all stacks.
+  - All environment variables are centralized for easy management.
 
 ---
 
